@@ -1,3 +1,6 @@
+import numpy as np
+import cv2
+
 class LineDetect:
     
     def __init__(self):
@@ -33,5 +36,7 @@ class LineDetect:
         else:
             #Nao consigo ver a linha
             a = 0
+            cx = 0
+            cy = 0
         
         return a,cx,cy    

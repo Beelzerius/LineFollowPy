@@ -1,4 +1,7 @@
-class ImageEfects:
+import numpy as np
+import cv2
+
+class ImageEffects:
     def __init__(self):
         pass
     

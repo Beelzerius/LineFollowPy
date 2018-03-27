@@ -1,6 +1,7 @@
 class Config:
     def __init__(self):
         #self.conf[''] = 
+        self.conf = {}
         self.conf['cam'] = -1
         self.conf['camW'] = 160
         self.conf['camH'] = 120
