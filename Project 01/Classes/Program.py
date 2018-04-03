@@ -6,6 +6,7 @@ import cv2
 from Classes.Camera import Camera
 from Classes.LineDetect import LineDetect
 from Classes.ImageEffects import ImageEffects
+from Classes.GpioController import GpioController
 from Config.Config import Config
 
 class Program:
@@ -22,6 +23,9 @@ class Program:
         ImEfc = ImageEffects()
         
         lineD = LineDetect()
+        
+        gC = GpioController()
+        
         while(True):
             frame = camera.captureFrame()
             crop_img = ImEfc.crop(frame,conf.getConfig("imgX"),conf.getConfig("imgY"),conf.getConfig("imgW"),conf.getConfig("imgH"))
@@ -29,7 +33,8 @@ class Program:
             
             contours = lineD.findContour(thresh)
             answer,cx,cy = lineD.getMov(contours)
-            print(answer)
+            
+            gC.setDir(answer)
             
             cv2.line(crop_img,(cx,0),(cx,720),(255,0,0),1)
             cv2.line(crop_img,(0,cy),(1280,cy),(255,0,0),1)
