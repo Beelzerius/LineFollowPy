@@ -21,11 +21,11 @@ class LineDetect:
                 cx = int(M['m10'])
                 cy = int(M['m01'])
 
-            if cx >= 120:
+            if cx >= 110:
                 #Esquerda
                 a = 2
 
-            if cx < 120 and cx > 50:
+            if cx < 110 and cx > 50:
                 #No Caminho 
                 a = 1
 
@@ -39,4 +39,4 @@ class LineDetect:
             cx = 0
             cy = 0
         
-        return a,cx,cy    
+        return cx,cy    

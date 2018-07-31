@@ -1,17 +1,27 @@
+#!/usr/bin/python
 import socket
-import numpy as np
 import cv2
+import numpy
 
-video_capture = cv2.VideoCapture(0)
+TCP_IP = 'localhost'
+TCP_PORT = 10000
 
-HOST = '127.0.0.1'  # Endereco IP do Servidor
-PORT = 10000            # Porta que o Servidor esta
-udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-dest = (HOST, PORT)
-print 'Para sair use CTRL+X\n'
-msg = raw_input()
-while msg <> '\x18':
-    ret, frame = video_capture.read()
-    udp.sendto (frame, dest)
-    msg = raw_input()
-udp.close()
+sock = socket.socket()
+sock.connect((TCP_IP, TCP_PORT))
+
+capture = cv2.VideoCapture(0)
+ret, frame = capture.read()
+
+encode_param=[int(cv2.IMWRITE_JPEG_QUALITY),90]
+result, imgencode = cv2.imencode('.jpg', frame, encode_param)
+data = numpy.array(imgencode)
+stringData = data.tostring()
+
+sock.send( str(len(stringData)).ljust(16));
+sock.send( stringData );
+sock.close()
+
+decimg=cv2.imdecode(data,1)
+cv2.imshow('CLIENT',decimg)
+cv2.waitKey(0)
+cv2.destroyAllWindows() 

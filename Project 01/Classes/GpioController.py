@@ -5,35 +5,36 @@ import cv2
 
 class GpioController:
     
-    def __init__(self):
+    def __init__(self,es,di):
         gpio.setmode(gpio.BOARD)
         
-        self.f = 11 #Frente
-        self.e = 13 #Esquerda
-        self.d = 15 #Direita
+        self.e = es #Esquerda
+        self.d = di #Direita
         
-        gpio.setup(self.f, gpio.OUT)
         gpio.setup(self.e, gpio.OUT)
         gpio.setup(self.d, gpio.OUT)
         
-        gpio.output(self.f,False)
-        gpio.output(self.e,False)
-        gpio.output(self.d,False)
+        self.pwmEsq = gpio.PWM(self.e,100)
+        self.pwmDir = gpio.PWM(self.d,100)
         
-    def setDir(self,op):
+        self.pwmEsq.start(0)
+        self.pwmDir.start(0)
         
-        if op == 1:
-            gpio.output(self.f,True)
-        else:
-            gpio.output(self.f,False)
+    def setDir(self,cont):
+        if cont > 80 :
+            por = 100 - (((cont-80) * 100) / 80)
+            print(por)
             
-        if op == 2:
-            gpio.output(self.e,True)
-        else:
-            gpio.output(self.e,False)
+            self.pwmDir.ChangeDutyCycle(100)
+            self.pwmEsq.ChangeDutyCycle(por)
+        elif cont < 80 :
+            por = (cont * 100) / 80
+            print(por)
             
-        if op == 3:
-            gpio.output(self.d,True)
-        else:
-            gpio.output(self.d,False)
+            self.pwmDir.ChangeDutyCycle(por)
+            self.pwmEsq.ChangeDutyCycle(100)
+        else :
+            self.pwmDir.ChangeDutyCycle(100)
+            self.pwmEsq.ChangeDutyCycle(100)
+        
         

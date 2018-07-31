@@ -24,7 +24,7 @@ class Program:
         
         lineD = LineDetect()
         
-        gC = GpioController()
+        gC = GpioController(conf.getConfig("Esq"),conf.getConfig("Dir"))
         
         while(True):
             frame = camera.captureFrame()
@@ -32,9 +32,9 @@ class Program:
             thresh = ImEfc.work(crop_img)
             
             contours = lineD.findContour(thresh)
-            answer,cx,cy = lineD.getMov(contours)
+            cx,cy = lineD.getMov(contours)
             
-            gC.setDir(answer)
+            gC.setDir(cx)
             
             cv2.line(crop_img,(cx,0),(cx,720),(255,0,0),1)
             cv2.line(crop_img,(0,cy),(1280,cy),(255,0,0),1)
