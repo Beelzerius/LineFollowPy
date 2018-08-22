@@ -5,8 +5,8 @@ import cv2
 
 class GpioController:
     
-    def __init__(self,es,di):
-        gpio.setmode(gpio.BOARD)
+    def __init__(self,es,di,mode,freq):
+        gpio.setmode(mode)
         
         self.e = es #Esquerda
         self.d = di #Direita
@@ -14,8 +14,8 @@ class GpioController:
         gpio.setup(self.e, gpio.OUT)
         gpio.setup(self.d, gpio.OUT)
         
-        self.pwmEsq = gpio.PWM(self.e,100)
-        self.pwmDir = gpio.PWM(self.d,100)
+        self.pwmEsq = gpio.PWM(self.e,freq)
+        self.pwmDir = gpio.PWM(self.d,freq)
         
         self.pwmEsq.start(0)
         self.pwmDir.start(0)
@@ -23,18 +23,26 @@ class GpioController:
     def setDir(self,cont):
         if cont > 80 :
             por = 100 - (((cont-80) * 100) / 80)
-            print(por)
+            print("E: " + str(por))
+            
+            texto = "E: " + str(por)
             
             self.pwmDir.ChangeDutyCycle(100)
             self.pwmEsq.ChangeDutyCycle(por)
         elif cont < 80 :
             por = (cont * 100) / 80
-            print(por)
+            print("D: " + str(por))
+            
+            texto = "D: " + str(por)
             
             self.pwmDir.ChangeDutyCycle(por)
             self.pwmEsq.ChangeDutyCycle(100)
         else :
             self.pwmDir.ChangeDutyCycle(100)
             self.pwmEsq.ChangeDutyCycle(100)
+            
+            texto = "ambos: 100"
+            
+        return texto
         
         

@@ -24,7 +24,13 @@ class Program:
         
         lineD = LineDetect()
         
-        gC = GpioController(conf.getConfig("Esq"),conf.getConfig("Dir"))
+        gC = GpioController(conf.getConfig("Esq"), conf.getConfig("Dir"), conf.getConfig("GpioMode"),conf.getConfig("freq"))
+        
+        font                   = cv2.FONT_HERSHEY_SIMPLEX
+        bottomLeftCornerOfText = (30,30)
+        fontScale              = 1
+        fontColor              = (255,255,255)
+        lineType               = 2
         
         while(True):
             frame = camera.captureFrame()
@@ -34,13 +40,15 @@ class Program:
             contours = lineD.findContour(thresh)
             cx,cy = lineD.getMov(contours)
             
-            gC.setDir(cx)
+            texto = gC.setDir(cx)
             
             cv2.line(crop_img,(cx,0),(cx,720),(255,0,0),1)
             cv2.line(crop_img,(0,cy),(1280,cy),(255,0,0),1)
 
             cv2.drawContours(crop_img, contours, -1, (0,255,0), 1)
+            cv2.putText(crop_img,texto, bottomLeftCornerOfText, font, fontScale, fontColor, lineType)
             cv2.imshow('frame',crop_img)
+            cv2.imshow('thresh',thresh)
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 print("foi 3")
                 break
