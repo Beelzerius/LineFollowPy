@@ -11,6 +11,6 @@ class ImageEffects:
     def work(self,img):
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         blur = cv2.GaussianBlur(gray,(5,5),0)
-        ret,thresh = cv2.threshold(blur,120,255,cv2.THRESH_BINARY_INV)
-        return thresh
+        ret,thresh = cv2.threshold(blur,135,255,cv2.THRESH_BINARY_INV)
+        return thresh, blur
         
