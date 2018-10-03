@@ -4,8 +4,11 @@ import time
 import cv2
 
 class GpioController:
+    """ Classe responsavel por administrar a Gpio do Raspberry Pi """
     
     def __init__(self,es,di,mode,freq):
+        """ Inicializa a classe criando seus atributos com as configurações"""
+        
         gpio.setmode(mode)
         
         self.e = es #Esquerda
@@ -20,29 +23,64 @@ class GpioController:
         self.pwmEsq.start(0)
         self.pwmDir.start(0)
         
+        self.es = 0
+        self.di = 0
+        
     def setDir(self,cont):
+        """ Troca o DutyCycle dos pinos para que continue na trilha """
+        
         if cont > 80 :
             por = 100 - (((cont-80) * 100) / 80)
-            print("E: " + str(por))
-            
-            texto = "E: " + str(por)
-            
-            self.pwmDir.ChangeDutyCycle(100)
-            self.pwmEsq.ChangeDutyCycle(por)
+            por = round(por)
+            if(por == 0):
+                if(self.di < self.es):
+                    self.pwmDir.ChangeDutyCycle(0)
+                    self.pwmEsq.ChangeDutyCycle(100)
+                    
+                    self.di = 0
+                    self.es = 100
+                else:
+                    self.pwmDir.ChangeDutyCycle(100)
+                    self.pwmEsq.ChangeDutyCycle(0)
+                    
+                    self.di = 100
+                    self.es = 0
+            else:
+                self.pwmDir.ChangeDutyCycle(100)
+                self.pwmEsq.ChangeDutyCycle(por)
+                
+                self.di = por
+                self.es = 100
         elif cont < 80 :
             por = (cont * 100) / 80
-            print("D: " + str(por))
+            por = round(por)
+            if(por == 0):
+                if(self.di < self.es):
+                    self.pwmDir.ChangeDutyCycle(0)
+                    self.pwmEsq.ChangeDutyCycle(100)
+                    
+                    self.di = 0
+                    self.es = 100
+                else:
+                    self.pwmDir.ChangeDutyCycle(100)
+                    self.pwmEsq.ChangeDutyCycle(0)
+                    
+                    self.di = 100
+                    self.es = 0
+            else:
+                self.pwmDir.ChangeDutyCycle(por)
+                self.pwmEsq.ChangeDutyCycle(100)
             
-            texto = "D: " + str(por)
-            
-            self.pwmDir.ChangeDutyCycle(por)
-            self.pwmEsq.ChangeDutyCycle(100)
+                self.di = 100
+                self.es = por
         else :
             self.pwmDir.ChangeDutyCycle(100)
             self.pwmEsq.ChangeDutyCycle(100)
             
-            texto = "ambos: 100"
+            self.di = 100
+            self.es = 100
             
-        return texto
+        out = "D: " + str(self.di) + " E: " + str(self.es)
+        return out
         
         

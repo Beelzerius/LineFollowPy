@@ -2,15 +2,20 @@ import numpy as np
 import cv2
 
 class LineDetect:
-    
-    def __init__(self):
-        pass
+    """ Classe responssavel por detectar a trilha """
     
     def findContour(self, thresh):
-        _,contours,hierarchy = cv2.findContours(thresh.copy(), 1, cv2.CHAIN_APPROX_NONE)
+        """ Procura pela linha e retorna """
+        
+        _,contours,hierarchy = cv2.findContours(thresh.copy(), 1,\
+            cv2.CHAIN_APPROX_NONE)
         return contours
-    
+
+
+
     def getMov (self,contours):
+        """ Encontra o meio da trilha e retorna as cordenadas """
+        
         if len(contours) > 0:
             c = max(contours, key=cv2.contourArea)
             M = cv2.moments(c)
@@ -21,21 +26,8 @@ class LineDetect:
                 cx = int(M['m10'])
                 cy = int(M['m01'])
 
-            if cx >= 110:
-                #Esquerda
-                a = 2
-
-            if cx < 110 and cx > 50:
-                #No Caminho 
-                a = 1
-
-            if cx <= 50:
-                #Direita
-                a = 3
-
         else:
             #Nao consigo ver a linha
-            a = 0
             cx = 0
             cy = 0
         

@@ -1,65 +1,58 @@
 import sys
-# Add the ptdraft folder path to the sys.path list
 sys.path.append('../')
-import numpy as np
 import cv2
+import numpy as np
 from Classes.Camera import Camera
 from Classes.LineDetect import LineDetect
 from Classes.ImageEffects import ImageEffects
 from Classes.GpioController import GpioController
+from Classes.Screen import Screen
 from Config.Config import Config
 
 class Program:
+    """ Classe principal do programa """
+    
     def __init__(self):
+        """ Inicializa a classe criando seus atributos com as configurações"""
+        
         self.conf = Config()
         pass
-        
+
+
+
     def Execute(self):
-        #Initial configs
+        """ Instancia as demais classes e inicia o while principal """
+        
         conf = self.conf
-        
-        camera = Camera(conf.getConfig("cam"),conf.getConfig("camW"),conf.getConfig("camH"))
-        
+        camera = Camera(conf.getConfig("cam"),conf.getConfig("camW"),\
+            conf.getConfig("camH"))
         ImEfc = ImageEffects()
-        
         lineD = LineDetect()
-        
-        gC = GpioController(conf.getConfig("Esq"), conf.getConfig("Dir"), conf.getConfig("GpioMode"),conf.getConfig("freq"))
-        
-        font                   = cv2.FONT_HERSHEY_SIMPLEX
-        bottomLeftCornerOfText = (30,30)
-        fontScale              = 1
-        fontColor              = (0,0,255) #BGR
-        lineType               = 2
+        gC = GpioController(conf.getConfig("Esq"),\
+            conf.getConfig("Dir"), conf.getConfig("GpioMode"),\
+            conf.getConfig("freq"))
+        screen = Screen(conf.getConfig("show"))
+        x, y, w, h = conf.getConfig("imgX"), conf.getConfig("imgY"),\
+            conf.getConfig("imgW"), conf.getConfig("imgH")
         
         while(True):
-            frame = camera.captureFrame()
-            crop_img = ImEfc.crop(frame,conf.getConfig("imgX"),conf.getConfig("imgY"),conf.getConfig("imgW"),conf.getConfig("imgH"))
-            thresh, blur = ImEfc.work(crop_img)
+            """ Loop principal """
             
+            frame = camera.captureFrame()
+            crop_img = ImEfc.crop(frame, x, y, w, h)
+            thresh, _ = ImEfc.work(crop_img)
             contours = lineD.findContour(thresh)
             cx,cy = lineD.getMov(contours)
+            string = gC.setDir(cx)
+            screen.printString(string)
+            crop_img = ImEfc.addLinesContours(crop_img, cx, cy,contours,\
+                w, h)
             
-            texto = gC.setDir(cx)
+            screen.insertImage("Crop", crop_img)
+            screen.insertImage("Thresh", thresh)
+            screen.draw()
             
-            cv2.line(crop_img,(cx,0),(cx,720),(255,0,0),1)
-            cv2.line(crop_img,(0,cy),(1280,cy),(255,0,0),1)
-
-            cv2.drawContours(crop_img, contours, -1, (0,255,0), 1)
-            cv2.putText(crop_img,texto, bottomLeftCornerOfText, font, fontScale, fontColor, lineType)
-            res = cv2.resize(crop_img,None,fx=2, fy=2, interpolation = cv2.INTER_CUBIC)
-            cv2.imshow('frame',res)
-            
-            res = cv2.resize(thresh,None,fx=2, fy=2, interpolation = cv2.INTER_CUBIC)
-            cv2.imshow('thresh',res)
-            
-            res = cv2.resize(blur,None,fx=2, fy=2, interpolation = cv2.INTER_CUBIC)
-            cv2.imshow('blur',res)
             if cv2.waitKey(1) & 0xFF == ord('q'):
-                print("foi 3")
+                """Fim do programa """
                 break
-        
-        
-        
-        
         
