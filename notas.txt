@@ -1,0 +1,84 @@
+
+git clone https://github.com/Beelzerius/LineFollowPy - Repositorio usado
+
+https://create.withcode.uk/python/A5 - Site capaz de mostrar uma falsa GPIO
+
+======================] Instalacao da Camera [======================
+sudo raspi-config - Lista as configuracoes do Raspberry e como a camera nao estava listada:
+sudo apt-get update
+sudo apt-get upgrade
+
+Applications Menu -> Preferences -> Raspberry Pi Configuration -> Interfaces -> Camera -> Enabled
+
+reboot - reinicia o Raspberry deixando a camera habilitada  
+
+raspistill -o image.jpg <- Testa a camera
+
+sudo ffmpeg -f x11grab -s 592x448 -i :0.0+0,0 t.mkv - grava tela
+
+======================] Instalacao das Bibliotecas OpenCV [======================
+
+sudo rpi-update
+sudo reboot
+sudo apt-get install build-essential git cmake pkg-config
+sudo apt-get install libjpeg-dev libtiff5-dev libjasper-dev libpng12-dev
+sudo apt-get install libavcodec-dev libavformat-dev libswscale-dev libv4l-dev
+sudo apt-get install libxvidcore-dev libx264-dev
+sudo apt-get install libgtk2.0-dev
+sudo apt-get install libatlas-base-dev gfortran
+cd ~
+git clone https://github.com/Itseez/opencv.git
+cd opencv
+git checkout 3.1.0
+cd ~
+git clone https://github.com/Itseez/opencv_contrib.git
+cd opencv_contrib
+git checkout 3.1.0
+
+sudo apt-get install python2.7-dev
+wget https://bootstrap.pypa.io/get-pip.py
+sudo python get-pip.py
+pip install numpy
+cd ~/opencv
+mkdir build
+cd build
+cmake -D CMAKE_BUILD_TYPE=RELEASE \
+    -D CMAKE_INSTALL_PREFIX=/usr/local \
+    -D INSTALL_C_EXAMPLES=OFF \
+    -D INSTALL_PYTHON_EXAMPLES=ON \
+    -D OPENCV_EXTRA_MODULES_PATH=~/opencv_contrib/modules \
+    -D BUILD_EXAMPLES=ON ..
+make -j4 <- Aqui
+sudo make install
+sudo ldconfig
+
+
+
+
+
+
+
+======================] Falhas [======================
+    def work(self,img):
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        thresh = cv2.adaptiveThreshold(gray,255,cv2.ADAPTIVE_THRESH_MEAN_C,cv2.THRESH_BINARY_INV,41,3)
+        
+        kernel = np.ones((5,5), np.uint8)
+        opening = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel)
+        closing = cv2.morphologyEx(opening, cv2.MORPH_CLOSE, kernel)
+        return closing
+        ->Muito processamento, resultado ruim
+        
+        
+        
+        
+        
+        
+======================] Avisos [======================
+
+Fazer um diagrama de classes;
+Fazer um fluxograma da instalação;
+Fazer tabelas para a detecção de luz;
+Começar o relatorio;
+Tirar algumas imagens do programa funcionando;
+Gravar um vídeo dele funcionando.
