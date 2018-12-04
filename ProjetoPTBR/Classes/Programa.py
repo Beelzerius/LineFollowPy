@@ -3,13 +3,13 @@ sys.path.append('../')
 import cv2
 import numpy as np
 from Classes.Camera import Camera
-from Classes.LineDetect import LineDetect
-from Classes.ImageEffects import ImageEffects
-from Classes.GpioController import GpioController
-from Classes.Screen import Screen
-from Config.Config import Config
+from Classes.DetectorDeLinhas import DetectorDeLinhas
+from Classes.Efeitos import Efeitos
+from Classes.ControladorGpio import ControladorGpio
+from Classes.Graficos import Graficos
+from Config.Configuracoes import Configuracoes
 
-class Program:
+class Programa:
     """ Classe principal do programa """
     
     def __init__(self):
@@ -19,7 +19,8 @@ class Program:
         pass
 
 
-    def Execute(self):
+
+    def executar(self):
         """ Instancia as demais classes e inicia o while principal """
         
         conf = self.conf
@@ -36,37 +37,24 @@ class Program:
         x, y, w, h = conf.getConfig("imgX"), conf.getConfig("imgY"),\
             conf.getConfig("imgW"), conf.getConfig("imgH")
         
-        insert = False;
         while(True):
             """ Loop principal """
             
-            frame = camera.captureFrame()
-            crop_img = ImEfc.crop(frame, x, y, w, h)
-            thresh, _ = ImEfc.work(crop_img)
+            img = camera.capturarImagem()
+            img_cortada = ImEfc.cortar(img, x, y, w, h)
+            img_binaria, _ = ImEfc.work(img_cortada)
             contours = lineD.findContour(thresh)
             cx,cy = lineD.getMov(contours)
-            if(insert):
-                string = gC.setDir(cx)
-            else:
-                string = gC.onlyShow(cx)
+            string = gC.setDir(cx)
+            screen.printString(string)
             crop_img = ImEfc.addLinesContours(crop_img, cx, cy,contours,\
                 w, h)
-
-            if cv2.waitKey(1) & 0xFF == ord('e'):
-                """Fim do programa """
-                gC.disableAll()
-                insert = False
-
-            if cv2.waitKey(1) & 0xFF == ord('s'):
-                """Fim do programa """
-                insert = True
             
             screen.insertImage("Crop", crop_img)
             screen.insertImage("Thresh", thresh)
-            screen.printString(string + " GPIO: " + str(insert))
             screen.draw()
             
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 """Fim do programa """
                 break
-            
+        

@@ -11,11 +11,11 @@ class Camera:
         self.video_capture.set(3, w)
         self.video_capture.set(4, h)
     
-    def captureFrame(self):
+    def capturarImagem(self):
         """ Captura imagem da camera e retorna """
         
-        ret, frame = self.video_capture.read()
-        return frame
+        ret, img = self.video_capture.read()
+        return img
         
 
     #Foram testadas os modelos das seguintes cameras:
